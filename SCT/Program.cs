@@ -1,15 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SCT
 {
+    public class RefEntry
+    {
+        public string Message { get; set; }
+        public bool EndHighlight { get; set; }
+    }
+
     class Program
     {
+        public static bool runEvent = true;
+        public static List<RefEntry> QuickRefence = new List<RefEntry> { };
+        public static int QRLimit;
+        public static ConsoleColor BackgroundColor;
+        public static ConsoleColor ForegrondColor;
+
         static void Main(string[] args)
         {
+            QRLimit = Settings.Default.QRLimit;
+            BackgroundColor = Settings.Default.BackgroundColor;
+            ForegrondColor = Settings.Default.ForegroundColor;
             while (true)
             {
                 Console.Clear();
