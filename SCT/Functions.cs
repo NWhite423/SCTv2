@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace SCT
 {
@@ -135,12 +136,276 @@ namespace SCT
         //Public functions
         public static void SlopeCalc()
         {
+            double Invert1 = 0;
+            double Invert2 = 0;
+            double Distance = 0;
+            string input;
+            
+            while (Program.runEvent)
+            {
+                Console.Clear();
+                Console.WriteLine("Slope Calculation\n" +
+                    "At any time, enter \"E\" to return to the main menu.\n" +
+                    "Elevation 1: " + Invert1.ToString("0.00") + "\n" +
+                    "Elevation 2: " + Invert2.ToString("0.00") + "\n" +
+                    "Distance: " + Distance.ToString("0.00") + "\n");
+                ShowQR();
 
+                if (Invert1.Equals(0))
+                {
+                    Console.Write("Please enter the first elevation: ");
+                    input = Console.ReadLine();
+                    if (Regex.IsMatch(input, @"^[0-9.]+$"))
+                    {
+                        if (Decimal.TryParse(input, out var op))
+                        {
+                            Invert1 = Convert.ToDouble(input);
+                        }
+                    }
+                    else
+                    {
+                        if (input.ToUpper().Equals("E"))
+                        {
+                            Program.runEvent = false;
+                        }
+                    }
+                } else
+                {
+                    if (Invert2.Equals(0))
+                    {
+                        Console.Write("Please enter the second elevation: ");
+                        input = Console.ReadLine();
+                        if (Regex.IsMatch(input, @"^[0-9.]+$"))
+                        {
+                            if (Decimal.TryParse(input, out var op))
+                            {
+                                Invert2 = Convert.ToDouble(input);
+                            }
+                        }
+                        else
+                        {
+                            if (input.ToUpper().Equals("E"))
+                            {
+                                Program.runEvent = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Distance.Equals(0))
+                        {
+                            Console.Write("Please enter the distance: ");
+                            input = Console.ReadLine();
+                            if (Regex.IsMatch(input, @"^[0-9.]+$"))
+                            {
+                                if (Decimal.TryParse(input, out var op))
+                                {
+                                    Distance = Convert.ToDouble(input);
+                                }
+                            }
+                            else
+                            {
+                                if (input.ToUpper().Equals("E"))
+                                {
+                                    Program.runEvent = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            string entry = String.Format("|{0} - {1}| / {2} = {3}", Invert1.ToString("0.00"), Invert2.ToString("0.00"), Distance.ToString("0.00"), ((Math.Abs(Invert1 - Invert2) / Distance)*100).ToString("0.00") + "%");
+                            AddToQR(entry);
+                            Invert1 = 0;
+                            Invert2 = 0;
+                            Distance = 0;
+                        }
+                    }
+                }
+            }
+            Program.runEvent = true;
         }
 
         public static void DistanceCalc()
         {
+            double elevation = 0;
+            double slope = 0;
+            double distance = 0;
+            bool direction = true;
+            bool checkDir = true;
+            string dirString = "";
+            string input;
 
+            while (Program.runEvent)
+            {
+                Console.Clear();
+                Console.WriteLine("Slope Calculation\n" +
+                    "At any time, enter \"E\" to return to the main menu.\n" +
+                    "Elevation: " + elevation.ToString("0.00") + "\n" +
+                    "Distance: " + distance.ToString("0.00") + "\n" +
+                    "Slope: " + slope.ToString("0.00000") + "\n" +
+                    "Flow: " + dirString + "\n");
+                ShowQR();
+
+                if (elevation.Equals(0))
+                {
+                    Console.Write("Please enter the elevation: ");
+                    input = Console.ReadLine();
+                    if (Regex.IsMatch(input, @"^[0-9.]+$"))
+                    {
+                        if (Decimal.TryParse(input, out var op))
+                        {
+                            elevation = Convert.ToDouble(input);
+                        }
+                    }
+                    else
+                    {
+                        if (input.ToUpper().Equals("E"))
+                        {
+                            Program.runEvent = false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (distance.Equals(0))
+                    {
+                        Console.Write("Please enter the distance: ");
+                        input = Console.ReadLine();
+                        if (Regex.IsMatch(input, @"^[0-9.]+$"))
+                        {
+                            if (Decimal.TryParse(input, out var op))
+                            {
+                                distance = Convert.ToDouble(input);
+                            }
+                        }
+                        else
+                        {
+                            if (input.ToUpper().Equals("E"))
+                            {
+                                Program.runEvent = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (slope.Equals(0))
+                        {
+                            Console.Write("Acceptable formats: 100.00%, 100.00\n" +
+                                "NOTE: If the slope is less than or equal 1.00%, please add a percent sign\n" +
+                                "Please enter the slope: ");
+                            input = Console.ReadLine();
+                            if (Regex.IsMatch(input, @"^[0-9.\%]+$"))
+                            {
+                                if (Decimal.TryParse(input, out var op))
+                                {
+                                    slope = Convert.ToDouble(input) / 100;
+                                } else
+                                {
+                                    if (Decimal.TryParse(input.TrimEnd('%'), out op))
+                                    {
+                                        slope = Convert.ToDouble(input.TrimEnd('%'))/100;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (input.ToUpper().Equals("E"))
+                                {
+                                    Program.runEvent = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (checkDir)
+                            {
+                                Console.Write("Please enter the direction (+/-): ");
+                                input = Console.ReadLine();
+                                if (input.Equals("+") || input.Equals("-"))
+                                {
+                                    if (input.Equals("+"))
+                                    {
+                                        direction = true;
+                                        dirString = "Posative";
+                                        checkDir = false;
+                                    } else
+                                    {
+                                        direction = false;
+                                        dirString = "Negative";
+                                        checkDir = false;
+                                    }
+                                }
+                                else
+                                {
+                                    if (input.ToUpper().Equals("E"))
+                                    {
+                                        Program.runEvent = false;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                double newElevation;
+                                string entry;
+                                if (direction)
+                                {
+                                    newElevation = elevation + distance * slope;
+                                    entry = String.Format("{0} + ({1} * {2}) = {3}", elevation.ToString("0.00"), distance.ToString("0.00"), slope.ToString("0.0000"), newElevation.ToString("0.00"));
+                                } else
+                                {
+                                    newElevation = elevation - distance * slope;
+                                    entry = String.Format("{0} - ({1} * {2}) = {3}", elevation.ToString("0.00"), distance.ToString("0.00"), slope.ToString("0.0000"), newElevation.ToString("0.00"));
+                                }
+                                AddToQR(entry);
+                                Console.Clear();
+                                Console.WriteLine("Slope Calculation\n" +
+                                    "At any time, enter \"E\" to return to the main menu.\n" +
+                                    "Elevation: " + elevation.ToString("0.00") + "\n" +
+                                    "Distance: " + distance.ToString("0.00") + "\n" +
+                                    "Slope: " + slope.ToString("0.00000") + "\n" +
+                                    "Flow: " + dirString + "\n");
+                                ShowQR();
+                                Console.Write("Please enter a new option (multiple options can be entered)\n" +
+                                    "Enter \"H\" to change the elevation\n" +
+                                    "Enter \"D\" to change the distance\n" +
+                                    "Enter \"S\" to change the slope\n" +
+                                    "Enter \"F\" to change the flow\n" +
+                                    "Leave blank to clear all information" +
+                                    "Please enter your option: ");
+                                input = Console.ReadLine();
+                                if (input.ToUpper().Contains("H"))
+                                {
+                                    elevation = 0;
+                                }
+                                if (input.ToUpper().Contains("D"))
+                                {
+                                    distance = 0;
+                                }
+                                if (input.ToUpper().Contains("S"))
+                                {
+                                    slope = 0;
+                                }
+                                if (input.ToUpper().Contains("F"))
+                                {
+                                    checkDir = true;
+                                }
+                                if (input.ToUpper().Equals("E"))
+                                {
+                                    Program.runEvent = false;
+                                }
+                                if (input.ToUpper().Equals(""))
+                                {
+                                    elevation = 0;
+                                    distance = 0;
+                                    slope = 0;
+                                    checkDir = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Program.runEvent = true;
         }
 
         public static void MeasureDownCalc()
@@ -169,7 +434,7 @@ namespace SCT
                         AddToQR(String.Format("Top elevation changed to {0} (was {1})", RefElevation, oldNumber));
                     } else
                     {
-                        if (input.Equals("E"))
+                        if (input.ToUpper().Equals("E"))
                         {
                             Program.runEvent = false;
                         } else
